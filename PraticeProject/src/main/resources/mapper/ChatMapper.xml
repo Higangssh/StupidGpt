@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chat">
+	<select id="getList" resultType="channelDto">
+		SELECT channel_id AS channelID, channel_name AS channelName
+		FROM channel_tbl
+		ORDER BY channel_id ASC
+	</select>
+	<insert id="newChannel" parameterType="String">
+		INSERT INTO CHANNEL_TBL
+		(channel_id, channel_name)
+		VALUES(channel_id_seq.NEXTVAL, #{channelName})
+	</insert>
+	<select id="getData" parameterType="int" resultType="chatDto" >
+		SELECT a.chat_id as channelId, a.content content,a.author author
+		FROM chat_tbl a
+		JOIN channel_tbl b on a.channel_id = b.channel_id
+		WHERE a.chat_id =#{chatId}
+	</select>
+	<insert id="insertChat" parameterType="chatDto">
+		INSERT INTO chat_tbl
+		(chat_id,channel_id, author, content, regdate)
+		VALUES(chat_id_seq.NEXTVAL,#{channelId}, #{author},#{content},SYSDATE)
+	</insert>
+	<select id="chatList" parameterType="int" resultType="chatDto">
+		SELECT chat_id AS chatId, channel_id AS channelId, author, content, regdate
+		FROM CHAT_TBL
+		WHERE CHANNEL_ID = #{channelId}
+		ORDER BY REGDATE ASC
+	</select>
+	<select id="addChannelList" resultType="chatdto">
+		SELECT channel_id AS channelID, channel_name AS channelName
+		FROM (
+		    SELECT channel_id, channel_name
+		    FROM channel_tbl
+		    ORDER BY channel_id DESC
+		)
+		WHERE ROWNUM = 1;
+	</select>
+	<delete id="deleteChannel" parameterType="int">
+		DELETE FROM CHANNEL_TBL
+		WHERE channel_id = #{channelId}
+	</delete>
+	<update id="updateChannel">
+		UPDATE CHANNEL_TBL
+		SET channel_name = #{channelName}
+		WHERE channel_id = #{channelId}
+	</update>
+</mapper>
